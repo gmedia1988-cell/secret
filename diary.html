@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Secret</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&family=Noto+Serif+KR:wght@400;500&family=Black+Han+Sans&family=Gamja+Flower&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -22,8 +25,9 @@
     --border: rgba(180,140,120,0.18);
     --border2: rgba(180,140,120,0.32);
     --shadow: rgba(180,120,80,0.10);
-    --font-serif: 'Noto Serif KR', 'Georgia', serif;
-    --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    --font-body: 'Noto Serif KR', serif;
+    --font-ui: 'Noto Sans KR', sans-serif;
+    --font-size-body: 17px;
     --radius: 20px;
     --radius-sm: 12px;
   }
@@ -47,138 +51,65 @@
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: var(--font-sans);
+    font-family: var(--font-ui);
     min-height: 100vh;
     overscroll-behavior: none;
   }
 
-  /* 로그인 화면 */
+  /* 로그인 */
   .login-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 40px 32px;
-    text-align: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 40px 32px; text-align: center;
   }
-  .login-icon {
-    font-size: 56px;
-    margin-bottom: 20px;
-  }
-  .login-title {
-    font-family: var(--font-serif);
-    font-size: 26px;
-    color: var(--text);
-    margin-bottom: 10px;
-  }
-  .login-sub {
-    font-size: 15px;
-    color: var(--text2);
-    line-height: 1.6;
-    margin-bottom: 40px;
-  }
+  .login-icon { font-size: 56px; margin-bottom: 20px; }
+  .login-title { font-family: var(--font-body); font-size: 28px; color: var(--text); margin-bottom: 10px; letter-spacing: 2px; }
+  .login-sub { font-size: 15px; color: var(--text2); line-height: 1.6; margin-bottom: 40px; }
   .btn-google {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 28px;
-    border-radius: var(--radius-sm);
-    background: var(--surface);
-    border: 1px solid var(--border2);
-    color: var(--text);
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-family: var(--font-sans);
+    display: flex; align-items: center; gap: 12px; padding: 14px 28px;
+    border-radius: var(--radius-sm); background: var(--surface);
+    border: 1px solid var(--border2); color: var(--text); font-size: 16px;
+    cursor: pointer; transition: all 0.15s; font-family: var(--font-ui);
   }
   .btn-google:active { transform: scale(0.97); }
   .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
 
   /* 로딩 */
-  .loading-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 2.5px solid var(--border2);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 16px; }
+  .spinner { width: 32px; height: 32px; border: 2.5px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .loading-text { font-size: 14px; color: var(--text3); }
 
   /* 헤더 */
   .app-header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: 16px 20px 12px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100; background: var(--bg);
+    border-bottom: 1px solid var(--border); padding: 16px 20px 12px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 4px;
-  }
-  .app-title {
-    font-family: var(--font-serif);
-    font-size: 22px;
-    color: var(--text);
-    letter-spacing: -0.3px;
-  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .app-title { font-family: var(--font-body); font-size: 22px; color: var(--text); letter-spacing: 2px; }
   .header-right { display: flex; gap: 8px; align-items: center; }
   .btn-new {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: none;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    font-size: 22px;
-    font-weight: 300;
-    line-height: 1;
-    transition: transform 0.15s, background 0.15s;
-    flex-shrink: 0;
+    width: 38px; height: 38px; border-radius: 50%; background: var(--accent); border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 22px; font-weight: 300; line-height: 1;
+    transition: transform 0.15s, background 0.15s; flex-shrink: 0;
   }
   .btn-new:active { transform: scale(0.92); background: var(--accent-dark); }
-  .btn-logout {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: none;
-    border: 1px solid var(--border2);
-    cursor: pointer;
+  .btn-icon {
+    width: 34px; height: 34px; border-radius: 50%; background: none;
+    border: 1px solid var(--border2); cursor: pointer;
     display: flex; align-items: center; justify-content: center;
-    color: var(--text3);
-    font-size: 16px;
-    transition: all 0.15s;
+    color: var(--text3); font-size: 16px; transition: all 0.15s;
   }
-  .btn-logout:active { background: var(--surface2); }
+  .btn-icon:active { background: var(--surface2); }
   .header-date { font-size: 13px; color: var(--text3); letter-spacing: 0.3px; }
 
   /* 탭 */
   .tabs { display: flex; gap: 6px; padding: 12px 20px 0; }
   .tab {
-    font-size: 14px;
-    font-family: var(--font-sans);
-    color: var(--text3);
-    background: none;
-    border: none;
-    padding: 6px 0;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s;
+    font-size: 14px; font-family: var(--font-ui); color: var(--text3);
+    background: none; border: none; padding: 6px 0; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
   }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
@@ -187,275 +118,169 @@
   .view.active { display: block; }
 
   /* 목록 */
-  .list-wrap {
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+  .list-wrap { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
   .empty-state { text-align: center; padding: 60px 20px; }
   .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-  .empty-text {
-    font-family: var(--font-serif);
-    color: var(--text3);
-    font-size: 17px;
-    line-height: 1.6;
-  }
+  .empty-text { font-family: var(--font-body); color: var(--text3); font-size: 17px; line-height: 1.6; }
   .entry-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 18px 20px;
-    cursor: pointer;
-    transition: transform 0.12s, box-shadow 0.12s;
-    position: relative;
-    overflow: hidden;
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 18px 20px; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s;
+    position: relative; overflow: hidden;
   }
   .entry-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: var(--accent);
-    opacity: 0;
-    transition: opacity 0.12s;
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--accent); opacity: 0; transition: opacity 0.12s;
   }
   .entry-card:active { transform: scale(0.985); box-shadow: 0 2px 12px var(--shadow); }
   .entry-card:active::before { opacity: 1; }
   .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .card-date { font-size: 12px; color: var(--text3); letter-spacing: 0.3px; }
   .mood-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .card-title {
-    font-family: var(--font-serif);
-    font-size: 17px;
-    color: var(--text);
-    margin-bottom: 6px;
-    line-height: 1.4;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .card-preview {
-    font-size: 14px;
-    color: var(--text2);
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
+  .card-title { font-family: var(--font-body); font-size: 17px; color: var(--text); margin-bottom: 6px; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-preview { font-size: 14px; color: var(--text2); line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
   /* 에디터 */
-  .editor-wrap { padding: 20px 20px 120px; }
+  .editor-wrap { padding: 20px 20px 140px; }
   .editor-back {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: none;
-    border: none;
-    color: var(--accent);
-    font-size: 15px;
-    cursor: pointer;
-    padding: 0;
-    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 6px; background: none; border: none;
+    color: var(--accent); font-size: 15px; cursor: pointer; padding: 0; margin-bottom: 20px;
+    font-family: var(--font-ui);
   }
   .editor-back svg { width: 18px; height: 18px; }
-  .editor-dateline { font-size: 13px; color: var(--text3); margin-bottom: 6px; letter-spacing: 0.3px; }
-  .mood-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .editor-dateline { font-size: 13px; color: var(--text3); margin-bottom: 12px; letter-spacing: 0.3px; }
+
+  /* 감정 */
+  .mood-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
   .mood-btn {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 7px 13px;
-    border-radius: 999px;
-    border: 1px solid var(--border2);
-    background: var(--surface);
-    font-size: 13px;
-    color: var(--text2);
-    cursor: pointer;
-    transition: all 0.12s;
+    display: flex; align-items: center; gap: 4px; padding: 6px 11px;
+    border-radius: 999px; border: 1px solid var(--border2); background: var(--surface);
+    font-size: 12px; color: var(--text2); cursor: pointer; transition: all 0.12s;
+    font-family: var(--font-ui);
   }
-  .mood-btn.selected {
-    background: var(--accent-light);
-    border-color: var(--accent);
-    color: var(--accent-dark);
-    font-weight: 500;
-  }
-  .mood-emoji { font-size: 16px; }
+  .mood-btn.selected { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); font-weight: 500; }
+  .mood-emoji { font-size: 15px; }
+
   input.title-input {
-    width: 100%;
-    border: none;
-    background: none;
-    font-family: var(--font-serif);
-    font-size: 22px;
-    color: var(--text);
-    outline: none;
-    padding: 0 0 14px;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 18px;
+    width: 100%; border: none; background: none; font-family: var(--font-body);
+    font-size: 22px; color: var(--text); outline: none; padding: 0 0 14px;
+    border-bottom: 1px solid var(--border); margin-bottom: 18px;
   }
   input.title-input::placeholder { color: var(--text3); }
   textarea.body-input {
-    width: 100%;
-    border: none;
-    background: none;
-    font-family: var(--font-serif);
-    font-size: 17px;
-    color: var(--text);
-    outline: none;
-    resize: none;
-    line-height: 1.9;
-    min-height: 280px;
-    padding: 0;
+    width: 100%; border: none; background: none;
+    font-family: var(--font-body); font-size: var(--font-size-body);
+    color: var(--text); outline: none; resize: none; line-height: 1.9;
+    min-height: 280px; padding: 0;
   }
   textarea.body-input::placeholder { color: var(--text3); }
 
   /* 하단 바 */
   .save-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    padding: 16px 20px;
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-    background: var(--bg);
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: 10px;
+    position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: var(--bg); border-top: 1px solid var(--border); display: flex; gap: 10px;
   }
   .btn-save {
-    flex: 1;
-    padding: 14px;
-    border-radius: var(--radius-sm);
-    background: var(--accent);
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.12s;
-    letter-spacing: 0.2px;
-    font-family: var(--font-sans);
+    flex: 1; padding: 14px; border-radius: var(--radius-sm); background: var(--accent);
+    border: none; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, transform 0.12s; letter-spacing: 0.2px; font-family: var(--font-ui);
   }
   .btn-save:active { transform: scale(0.97); background: var(--accent-dark); }
   .btn-delete {
-    padding: 14px 18px;
-    border-radius: var(--radius-sm);
-    background: none;
-    border: 1px solid var(--border2);
-    color: var(--text3);
-    font-size: 15px;
-    cursor: pointer;
-    transition: all 0.12s;
-    font-family: var(--font-sans);
+    padding: 14px 18px; border-radius: var(--radius-sm); background: none;
+    border: 1px solid var(--border2); color: var(--text3); font-size: 15px;
+    cursor: pointer; transition: all 0.12s; font-family: var(--font-ui);
   }
   .btn-delete:active { background: #fee; color: #c44; border-color: #c44; }
 
   /* 상세 */
-  .detail-title {
-    font-family: var(--font-serif);
-    font-size: 24px;
-    color: var(--text);
-    line-height: 1.4;
-    margin-bottom: 20px;
-  }
-  .detail-body {
-    font-family: var(--font-serif);
-    font-size: 17px;
-    color: var(--text);
-    line-height: 1.9;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .detail-mood {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: var(--accent-light);
-    border-radius: 999px;
-    font-size: 13px;
-    color: var(--accent-dark);
-    margin-bottom: 20px;
-  }
+  .detail-title { font-family: var(--font-body); font-size: 24px; color: var(--text); line-height: 1.4; margin-bottom: 20px; }
+  .detail-body { font-family: var(--font-body); font-size: var(--font-size-body); color: var(--text); line-height: 1.9; white-space: pre-wrap; word-break: break-word; }
+  .detail-mood { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: var(--accent-light); border-radius: 999px; font-size: 13px; color: var(--accent-dark); margin-bottom: 20px; }
 
   /* 검색 */
   .search-wrap { padding: 12px 20px 0; }
   .search-input {
-    width: 100%;
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.15s;
-    font-family: var(--font-sans);
+    width: 100%; padding: 10px 16px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    font-size: 15px; outline: none; transition: border-color 0.15s; font-family: var(--font-ui);
   }
   .search-input:focus { border-color: var(--accent); }
   .search-input::placeholder { color: var(--text3); }
 
   /* 통계 */
   .stats-wrap { padding: 20px; }
-  .stat-card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 20px;
-    margin-bottom: 12px;
-  }
+  .stat-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 12px; }
   .stat-label { font-size: 13px; color: var(--text3); margin-bottom: 8px; }
-  .stat-value { font-family: var(--font-serif); font-size: 28px; color: var(--text); }
+  .stat-value { font-family: var(--font-body); font-size: 28px; color: var(--text); }
   .stat-sub { font-size: 13px; color: var(--text2); margin-top: 4px; }
   .streak-bar { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px; }
-  .streak-dot {
-    width: 28px; height: 28px;
-    border-radius: 8px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px;
-    color: var(--text3);
-  }
-  .streak-dot.has-entry {
-    background: var(--accent-light);
-    border-color: var(--accent);
-    color: var(--accent-dark);
-  }
+  .streak-dot { width: 28px; height: 28px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--text3); }
+  .streak-dot.has-entry { background: var(--accent-light); border-color: var(--accent); color: var(--accent-dark); }
   .mood-chart { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
   .mood-row-stat { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text2); }
   .mood-bar-bg { flex: 1; height: 8px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
   .mood-bar-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.6s ease; }
   .mood-bar-count { font-size: 12px; color: var(--text3); min-width: 20px; text-align: right; }
 
-  /* 저장 중 표시 */
+  /* 설정 패널 */
+  .settings-panel {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4); z-index: 200; display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .settings-panel.open { opacity: 1; pointer-events: all; }
+  .settings-sheet {
+    background: var(--bg); border-radius: 24px 24px 0 0; padding: 24px 20px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom)); width: 100%;
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(.32,.72,0,1);
+  }
+  .settings-panel.open .settings-sheet { transform: translateY(0); }
+  .settings-title { font-family: var(--font-body); font-size: 18px; color: var(--text); margin-bottom: 24px; }
+  .settings-section { margin-bottom: 24px; }
+  .settings-label { font-size: 13px; color: var(--text3); margin-bottom: 12px; }
+  .font-options { display: flex; flex-direction: column; gap: 8px; }
+  .font-option {
+    padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface); cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--text); font-size: 16px;
+  }
+  .font-option.selected { border-color: var(--accent); background: var(--accent-light); }
+  .font-option span { font-size: 13px; color: var(--text3); }
+  .size-row { display: flex; align-items: center; gap: 12px; }
+  .size-btn {
+    width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border2);
+    background: var(--surface); color: var(--text); font-size: 20px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.12s;
+    font-family: var(--font-ui);
+  }
+  .size-btn:active { background: var(--accent-light); border-color: var(--accent); }
+  .size-display { flex: 1; text-align: center; font-size: 16px; color: var(--text); }
+  .btn-close-settings {
+    width: 100%; padding: 14px; border-radius: var(--radius-sm); background: var(--accent);
+    border: none; color: #fff; font-size: 16px; cursor: pointer; font-family: var(--font-ui);
+  }
+
+  /* 토스트 */
   .saving-toast {
-    position: fixed;
-    top: 80px; left: 50%; transform: translateX(-50%);
-    background: var(--text);
-    color: var(--bg);
-    font-size: 13px;
-    padding: 8px 18px;
-    border-radius: 999px;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-    z-index: 999;
-    white-space: nowrap;
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: var(--bg); font-size: 13px; padding: 8px 18px;
+    border-radius: 999px; opacity: 0; transition: opacity 0.2s;
+    pointer-events: none; z-index: 999; white-space: nowrap;
   }
   .saving-toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
-<!-- 로딩 -->
 <div id="screenLoading" class="loading-screen">
   <div class="spinner"></div>
   <div class="loading-text">불러오는 중...</div>
 </div>
 
-<!-- 로그인 -->
 <div id="screenLogin" class="login-screen" style="display:none">
-  <div class="login-icon">📖</div>
+  <div class="login-icon">🤫</div>
   <h1 class="login-title">Secret</h1>
   <p class="login-sub">Google 계정으로 로그인하면<br>어떤 기기에서나 일기를 쓸 수 있어요.</p>
   <button class="btn-google" id="btnGoogleLogin">
@@ -469,13 +294,13 @@
   </button>
 </div>
 
-<!-- 앱 본체 -->
 <div id="screenApp" style="display:none">
   <div class="app-header">
     <div class="header-top">
       <h1 class="app-title">Secret</h1>
       <div class="header-right">
-        <button class="btn-logout" id="btnLogout" title="로그아웃">↩</button>
+        <button class="btn-icon" id="btnSettings" title="설정">⚙</button>
+        <button class="btn-icon" id="btnLogout" title="로그아웃">↩</button>
         <button class="btn-new" id="btnNew" aria-label="새 일기 쓰기">+</button>
       </div>
     </div>
@@ -488,9 +313,7 @@
       <button class="tab" onclick="switchTab('search',this)">검색</button>
       <button class="tab" onclick="switchTab('stats',this)">통계</button>
     </div>
-    <div id="tabAll">
-      <div class="list-wrap" id="entryList"></div>
-    </div>
+    <div id="tabAll"><div class="list-wrap" id="entryList"></div></div>
     <div id="tabSearch" style="display:none">
       <div class="search-wrap">
         <input class="search-input" id="searchInput" type="search" placeholder="제목, 내용으로 검색..." oninput="doSearch()" />
@@ -537,6 +360,31 @@
   </div>
 </div>
 
+<!-- 설정 패널 -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-sheet">
+    <div class="settings-title">설정</div>
+    <div class="settings-section">
+      <div class="settings-label">폰트 크기</div>
+      <div class="size-row">
+        <button class="size-btn" id="sizeDown">−</button>
+        <div class="size-display" id="sizeDisplay">17px</div>
+        <button class="size-btn" id="sizeUp">+</button>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-label">폰트 종류</div>
+      <div class="font-options" id="fontOptions">
+        <div class="font-option selected" data-font="'Noto Serif KR', serif" onclick="selectFont(this)" style="font-family:'Noto Serif KR',serif">노토 세리프 <span>단정한 명조체</span></div>
+        <div class="font-option" data-font="'Noto Sans KR', sans-serif" onclick="selectFont(this)" style="font-family:'Noto Sans KR',sans-serif">노토 산스 <span>깔끔한 고딕체</span></div>
+        <div class="font-option" data-font="'Gamja Flower', cursive" onclick="selectFont(this)" style="font-family:'Gamja Flower',cursive">감자꽃 <span>귀여운 손글씨체</span></div>
+        <div class="font-option" data-font="'Black Han Sans', sans-serif" onclick="selectFont(this)" style="font-family:'Black Han Sans',sans-serif">블랙한산스 <span>굵고 강렬한 고딕</span></div>
+      </div>
+    </div>
+    <button class="btn-close-settings" id="btnCloseSettings">닫기</button>
+  </div>
+</div>
+
 <div class="saving-toast" id="toast"></div>
 
 <script type="module">
@@ -559,18 +407,24 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const MOODS = [
-  { key: 'great',    emoji: '😊', label: '좋아요',     color: '#4caf92' },
-  { key: 'excited',  emoji: '🤩', label: '신났어요',   color: '#e08c5a' },
-  { key: 'happy',    emoji: '😄', label: '행복해요',   color: '#f7c948' },
-  { key: 'love',     emoji: '🥰', label: '설레요',     color: '#e8758a' },
-  { key: 'calm',     emoji: '😌', label: '평온해요',   color: '#7a9ecc' },
-  { key: 'okay',     emoji: '😐', label: '그냥저냥',   color: '#b8a56a' },
-  { key: 'tired',    emoji: '😴', label: '피곤해요',   color: '#9e8fc4' },
-  { key: 'anxious',  emoji: '😰', label: '불안해요',   color: '#78b4c8' },
-  { key: 'bad',      emoji: '😔', label: '힘들었어요', color: '#c8856a' },
-  { key: 'angry',    emoji: '😤', label: '화났어요',   color: '#d95f5f' },
-  { key: 'sad',      emoji: '😢', label: '슬퍼요',     color: '#6a8fc8' },
-  { key: 'sick',     emoji: '🤒', label: '아파요',     color: '#a0b87a' },
+  { key: 'great',      emoji: '😊', label: '좋아요',     color: '#4caf92' },
+  { key: 'excited',    emoji: '🤩', label: '신났어요',   color: '#e08c5a' },
+  { key: 'happy',      emoji: '😄', label: '행복해요',   color: '#f7c948' },
+  { key: 'love',       emoji: '🥰', label: '설레요',     color: '#e8758a' },
+  { key: 'proud',      emoji: '😤', label: '뿌듯해요',   color: '#7ec87e' },
+  { key: 'grateful',   emoji: '🙏', label: '감사해요',   color: '#9ec4e8' },
+  { key: 'calm',       emoji: '😌', label: '평온해요',   color: '#7a9ecc' },
+  { key: 'okay',       emoji: '😐', label: '그냥저냥',   color: '#b8a56a' },
+  { key: 'tired',      emoji: '😴', label: '피곤해요',   color: '#9e8fc4' },
+  { key: 'bored',      emoji: '🥱', label: '지루해요',   color: '#c4b89e' },
+  { key: 'anxious',    emoji: '😰', label: '불안해요',   color: '#78b4c8' },
+  { key: 'lonely',     emoji: '🥺', label: '외로워요',   color: '#b49ec4' },
+  { key: 'bad',        emoji: '😔', label: '힘들었어요', color: '#c8856a' },
+  { key: 'sad',        emoji: '😢', label: '슬퍼요',     color: '#6a8fc8' },
+  { key: 'angry',      emoji: '😡', label: '화났어요',   color: '#d95f5f' },
+  { key: 'sick',       emoji: '🤒', label: '아파요',     color: '#a0b87a' },
+  { key: 'surprised',  emoji: '😲', label: '놀랐어요',   color: '#e8c45a' },
+  { key: 'nervous',    emoji: '😬', label: '긴장돼요',   color: '#c4a87a' },
 ];
 
 let currentUser = null;
@@ -578,9 +432,50 @@ let entries = [];
 let currentId = null;
 let selectedMood = null;
 
-function colRef() {
-  return collection(db, 'diaries', currentUser.uid, 'entries');
+// 설정 불러오기
+let fontSize = parseInt(localStorage.getItem('diary_fontSize') || '17');
+let fontFamily = localStorage.getItem('diary_font') || "'Noto Serif KR', serif";
+applySettings();
+
+function applySettings() {
+  document.documentElement.style.setProperty('--font-size-body', fontSize + 'px');
+  document.documentElement.style.setProperty('--font-body', fontFamily);
+  document.getElementById('sizeDisplay').textContent = fontSize + 'px';
+  document.querySelectorAll('.font-option').forEach(el => {
+    el.classList.toggle('selected', el.dataset.font === fontFamily);
+  });
 }
+
+window.selectFont = function(el) {
+  fontFamily = el.dataset.font;
+  localStorage.setItem('diary_font', fontFamily);
+  applySettings();
+};
+
+document.getElementById('sizeUp').onclick = () => {
+  if (fontSize >= 24) return;
+  fontSize++;
+  localStorage.setItem('diary_fontSize', fontSize);
+  applySettings();
+};
+document.getElementById('sizeDown').onclick = () => {
+  if (fontSize <= 13) return;
+  fontSize--;
+  localStorage.setItem('diary_fontSize', fontSize);
+  applySettings();
+};
+
+document.getElementById('btnSettings').onclick = () => {
+  document.getElementById('settingsPanel').classList.add('open');
+};
+document.getElementById('btnCloseSettings').onclick = () => {
+  document.getElementById('settingsPanel').classList.remove('open');
+};
+document.getElementById('settingsPanel').onclick = (e) => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+};
+
+function colRef() { return collection(db, 'diaries', currentUser.uid, 'entries'); }
 
 function toast(msg, duration = 1800) {
   const t = document.getElementById('toast');
@@ -794,11 +689,11 @@ function renderStats() {
     <div class="stat-card">
       <div class="stat-label">감정 분포</div>
       <div class="mood-chart">
-        ${MOODS.map(m => {
+        ${MOODS.filter(m => moodCounts[m.key]).map(m => {
           const cnt = moodCounts[m.key] || 0;
           const pct = Math.round(cnt / maxMood * 100);
           return `<div class="mood-row-stat">
-            <span style="width:62px;font-size:13px">${m.emoji} ${m.label}</span>
+            <span style="width:70px;font-size:13px">${m.emoji} ${m.label}</span>
             <div class="mood-bar-bg"><div class="mood-bar-fill" style="width:${pct}%;background:${m.color}"></div></div>
             <span class="mood-bar-count">${cnt}</span>
           </div>`;
@@ -807,31 +702,24 @@ function renderStats() {
     </div>`;
 }
 
-// 날짜 헤더
 const now = new Date();
 const weekdays = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 document.getElementById('headerDate').textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 ${weekdays[now.getDay()]}`;
 
-// textarea 자동 높이
 document.getElementById('bodyInput').addEventListener('input', function() {
   this.style.height = 'auto';
   this.style.height = this.scrollHeight + 'px';
 });
 
-// 로그인/로그아웃
 document.getElementById('btnGoogleLogin').onclick = async () => {
-  try {
-    await signInWithPopup(auth, new GoogleAuthProvider());
-  } catch(e) {
-    alert('로그인 실패: ' + e.message);
-  }
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch(e) { alert('로그인 실패: ' + e.message); }
 };
 
 document.getElementById('btnLogout').onclick = async () => {
   if (confirm('로그아웃 하시겠어요?')) await signOut(auth);
 };
 
-// 인증 상태 감지
 onAuthStateChanged(auth, async (user) => {
   document.getElementById('screenLoading').style.display = 'none';
   if (user) {
