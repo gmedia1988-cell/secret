@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>나의 일기장</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #fdf8f3;
+    --surface: #fff;
+    --surface2: #faf5ef;
+    --text: #2c2420;
+    --text2: #8c7b72;
+    --text3: #b8a89e;
+    --accent: #c8856a;
+    --accent-light: #f5ede8;
+    --accent-dark: #a06650;
+    --border: rgba(180,140,120,0.18);
+    --border2: rgba(180,140,120,0.32);
+    --shadow: rgba(180,120,80,0.10);
+    --font-serif: 'Noto Serif KR', 'Georgia', serif;
+    --font-sans: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    --radius: 20px;
+    --radius-sm: 12px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1814;
+      --surface: #2a211b;
+      --surface2: #231c16;
+      --text: #f0e6dc;
+      --text2: #a89080;
+      --text3: #6e5a50;
+      --accent: #d4967e;
+      --accent-light: rgba(210,130,90,0.15);
+      --border: rgba(180,140,120,0.12);
+      --border2: rgba(180,140,120,0.22);
+      --shadow: rgba(0,0,0,0.3);
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
+
+  /* 로그인 화면 */
+  .login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .login-icon {
+    font-size: 56px;
+    margin-bottom: 20px;
+  }
+  .login-title {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .login-sub {
+    font-size: 15px;
+    color: var(--text2);
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+  .btn-google {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 28px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: var(--font-sans);
+  }
+  .btn-google:active { transform: scale(0.97); }
+  .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  /* 로딩 */
+  .loading-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2.5px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--text3); }
+
+  /* 헤더 */
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 12px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .app-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+  .header-right { display: flex; gap: 8px; align-items: center; }
+  .btn-new {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1;
+    transition: transform 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-new:active { transform: scale(0.92); background: var(--accent-dark); }
+  .btn-logout {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: none;
+    border: 1px solid var(--border2);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text3);
+    font-size: 16px;
+    transition: all 0.15s;
+  }
+  .btn-logout:active { background: var(--surface2); }
+  .header-date { font-size: 13px; color: var(--text3); letter-spacing: 0.3px; }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 6px; padding: 12px 20px 0; }
+  .tab {
+    font-size: 14px;
+    font-family: var(--font-sans);
+    color: var(--text3);
+    background: none;
+    border: none;
+    padding: 6px 0;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* 뷰 */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* 목록 */
+  .list-wrap {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .empty-state { text-align: center; padding: 60px 20px; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+  .empty-text {
+    font-family: var(--font-serif);
+    color: var(--text3);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .entry-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    position: relative;
+    overflow: hidden;
+  }
+  .entry-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.12s;
+  }
+  .entry-card:active { transform: scale(0.985); box-shadow: 0 2px 12px var(--shadow); }
+  .entry-card:active::before { opacity: 1; }
+  .card-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .card-date { font-size: 12px; color: var(--text3); letter-spacing: 0.3px; }
+  .mood-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .card-title {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-preview {
+    font-size: 14px;
+    color: var(--text2);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 에디터 */
+  .editor-wrap { padding: 20px 20px 120px; }
+  .editor-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  .editor-back svg { width: 18px; height: 18px; }
+  .editor-dateline { font-size: 13px; color: var(--text3); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .mood-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .mood-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .mood-btn.selected {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+    font-weight: 500;
+  }
+  .mood-emoji { font-size: 16px; }
+  input.title-input {
+    width: 100%;
+    border: none;
+    background: none;
+    font-family: var(--font-serif);
+    font-size: 22px;
+    color: var(--text);
+    outline: none;
+    padding: 0 0 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 18px;
+  }
+  input.title-input::placeholder { color: var(--text3); }
+  textarea.body-input {
+    width: 100%;
+    border: none;
+    background: none;
+    font-family: var(--font-serif);
+    font-size: 17px;
+    color: var(--text);
+    outline: none;
+    resize: none;
+    line-height: 1.9;
+    min-height: 280px;
+    padding: 0;
+  }
+  textarea.body-input::placeholder { color: var(--text3); }
+
+  /* 하단 바 */
+  .save-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 16px 20px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+  }
+  .btn-save {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    letter-spacing: 0.2px;
+    font-family: var(--font-sans);
+  }
+  .btn-save:active { transform: scale(0.97); background: var(--accent-dark); }
+  .btn-delete {
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.12s;
+    font-family: var(--font-sans);
+  }
+  .btn-delete:active { background: #fee; color: #c44; border-color: #c44; }
+
+  /* 상세 */
+  .detail-title {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 20px;
+  }
+  .detail-body {
+    font-family: var(--font-serif);
+    font-size: 17px;
+    color: var(--text);
+    line-height: 1.9;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .detail-mood {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: var(--accent-light);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--accent-dark);
+    margin-bottom: 20px;
+  }
+
+  /* 검색 */
+  .search-wrap { padding: 12px 20px 0; }
+  .search-input {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: var(--font-sans);
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--text3); }
+
+  /* 통계 */
+  .stats-wrap { padding: 20px; }
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .stat-label { font-size: 13px; color: var(--text3); margin-bottom: 8px; }
+  .stat-value { font-family: var(--font-serif); font-size: 28px; color: var(--text); }
+  .stat-sub { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .streak-bar { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px; }
+  .streak-dot {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+    color: var(--text3);
+  }
+  .streak-dot.has-entry {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    color: var(--accent-dark);
+  }
+  .mood-chart { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .mood-row-stat { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text2); }
+  .mood-bar-bg { flex: 1; height: 8px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+  .mood-bar-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.6s ease; }
+  .mood-bar-count { font-size: 12px; color: var(--text3); min-width: 20px; text-align: right; }
+
+  /* 저장 중 표시 */
+  .saving-toast {
+    position: fixed;
+    top: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--text);
+    color: var(--bg);
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 999px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+  .saving-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- 로딩 -->
+<div id="screenLoading" class="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text">불러오는 중...</div>
+</div>
+
+<!-- 로그인 -->
+<div id="screenLogin" class="login-screen" style="display:none">
+  <div class="login-icon">📖</div>
+  <h1 class="login-title">나의 일기장</h1>
+  <p class="login-sub">Google 계정으로 로그인하면<br>어떤 기기에서나 일기를 쓸 수 있어요.</p>
+  <button class="btn-google" id="btnGoogleLogin">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Google로 로그인
+  </button>
+</div>
+
+<!-- 앱 본체 -->
+<div id="screenApp" style="display:none">
+  <div class="app-header">
+    <div class="header-top">
+      <h1 class="app-title">✦ 일기장</h1>
+      <div class="header-right">
+        <button class="btn-logout" id="btnLogout" title="로그아웃">↩</button>
+        <button class="btn-new" id="btnNew" aria-label="새 일기 쓰기">+</button>
+      </div>
+    </div>
+    <div class="header-date" id="headerDate"></div>
+  </div>
+
+  <div id="viewList" class="view active">
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('all',this)">모두</button>
+      <button class="tab" onclick="switchTab('search',this)">검색</button>
+      <button class="tab" onclick="switchTab('stats',this)">통계</button>
+    </div>
+    <div id="tabAll">
+      <div class="list-wrap" id="entryList"></div>
+    </div>
+    <div id="tabSearch" style="display:none">
+      <div class="search-wrap">
+        <input class="search-input" id="searchInput" type="search" placeholder="제목, 내용으로 검색..." oninput="doSearch()" />
+      </div>
+      <div class="list-wrap" id="searchList"></div>
+    </div>
+    <div id="tabStats" style="display:none">
+      <div class="stats-wrap" id="statsContent"></div>
+    </div>
+  </div>
+
+  <div id="viewEditor" class="view">
+    <div class="editor-wrap">
+      <button class="editor-back" id="editorBack">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        목록으로
+      </button>
+      <div class="editor-dateline" id="editorDateline"></div>
+      <div class="mood-row" id="moodRow"></div>
+      <input class="title-input" id="titleInput" type="text" placeholder="제목 없음" maxlength="80" />
+      <textarea class="body-input" id="bodyInput" placeholder="오늘 하루는 어땠나요..."></textarea>
+    </div>
+    <div class="save-bar">
+      <button class="btn-delete" id="btnDelete" style="display:none">삭제</button>
+      <button class="btn-save" id="btnSave">저장하기</button>
+    </div>
+  </div>
+
+  <div id="viewDetail" class="view">
+    <div class="editor-wrap">
+      <button class="editor-back" id="detailBack">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        목록으로
+      </button>
+      <div class="editor-dateline" id="detailDateline"></div>
+      <div id="detailMood"></div>
+      <h2 class="detail-title" id="detailTitle"></h2>
+      <div class="detail-body" id="detailBody"></div>
+    </div>
+    <div class="save-bar">
+      <button class="btn-delete" id="btnDetailDelete">삭제</button>
+      <button class="btn-save" id="btnEdit">수정하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="saving-toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCZ8GYafU6TKYw_uPQIKpE5s07rVDzrmHU",
+  authDomain: "secret-6cef1.firebaseapp.com",
+  projectId: "secret-6cef1",
+  storageBucket: "secret-6cef1.firebasestorage.app",
+  messagingSenderId: "27720129100",
+  appId: "1:27720129100:web:ca6f0ff2864ac04b5032e9",
+  measurementId: "G-JGPD8D9KVD"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const MOODS = [
+  { key: 'great',   emoji: '😊', label: '좋아요',    color: '#4caf92' },
+  { key: 'okay',    emoji: '😐', label: '그냥저냥',  color: '#b8a56a' },
+  { key: 'bad',     emoji: '😔', label: '힘들었어요', color: '#c8856a' },
+  { key: 'excited', emoji: '🤩', label: '신났어요',  color: '#e08c5a' },
+  { key: 'calm',    emoji: '😌', label: '평온해요',  color: '#7a9ecc' },
+];
+
+let currentUser = null;
+let entries = [];
+let currentId = null;
+let selectedMood = null;
+
+function colRef() {
+  return collection(db, 'diaries', currentUser.uid, 'entries');
+}
+
+function toast(msg, duration = 1800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+async function loadEntries() {
+  const q = query(colRef(), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderList();
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  const days = ['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
+function formatDateShort(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view' + name).classList.add('active');
+}
+
+window.switchTab = function(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabAll').style.display = name === 'all' ? '' : 'none';
+  document.getElementById('tabSearch').style.display = name === 'search' ? '' : 'none';
+  document.getElementById('tabStats').style.display = name === 'stats' ? '' : 'none';
+  if (name === 'stats') renderStats();
+};
+
+function renderList() {
+  const wrap = document.getElementById('entryList');
+  if (!entries.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📖</div><p class="empty-text">아직 작성된 일기가 없어요.<br>오늘의 이야기를 기록해 보세요.</p></div>`;
+    return;
+  }
+  wrap.innerHTML = entries.map(e => {
+    const mood = MOODS.find(m => m.key === e.mood);
+    return `<div class="entry-card" onclick="openDetail('${e.id}')">
+      <div class="card-meta">
+        ${mood ? `<span class="mood-dot" style="background:${mood.color}"></span>` : ''}
+        <span class="card-date">${formatDateShort(e.createdAt)}</span>
+        ${mood ? `<span style="font-size:11px;color:var(--text3)">${mood.label}</span>` : ''}
+      </div>
+      <div class="card-title">${escHtml(e.title || '제목 없음')}</div>
+      <div class="card-preview">${escHtml(e.body || '')}</div>
+    </div>`;
+  }).join('');
+}
+
+window.openDetail = function(id) {
+  const entry = entries.find(e => e.id === id);
+  if (!entry) return;
+  currentId = id;
+  document.getElementById('detailDateline').textContent = formatDate(entry.createdAt);
+  const mood = MOODS.find(m => m.key === entry.mood);
+  document.getElementById('detailMood').innerHTML = mood
+    ? `<div class="detail-mood"><span>${mood.emoji}</span><span>${mood.label}</span></div>` : '';
+  document.getElementById('detailTitle').textContent = entry.title || '제목 없음';
+  document.getElementById('detailBody').textContent = entry.body || '';
+  showView('Detail');
+};
+
+document.getElementById('detailBack').onclick = () => { currentId = null; showView('List'); };
+document.getElementById('btnDetailDelete').onclick = () => deleteEntry(currentId);
+document.getElementById('btnEdit').onclick = () => {
+  const entry = entries.find(e => e.id === currentId);
+  if (entry) openEditor(entry);
+};
+
+function openEditor(entry) {
+  selectedMood = entry ? entry.mood : null;
+  document.getElementById('editorDateline').textContent = entry ? formatDate(entry.createdAt) : formatDate(new Date().toISOString());
+  document.getElementById('titleInput').value = entry ? (entry.title || '') : '';
+  document.getElementById('bodyInput').value = entry ? (entry.body || '') : '';
+  document.getElementById('btnDelete').style.display = entry ? '' : 'none';
+  document.getElementById('btnSave').textContent = entry ? '수정 저장' : '저장하기';
+  const row = document.getElementById('moodRow');
+  row.innerHTML = MOODS.map(m => `
+    <button class="mood-btn ${selectedMood === m.key ? 'selected' : ''}" onclick="selectMood('${m.key}',this)">
+      <span class="mood-emoji">${m.emoji}</span>${m.label}
+    </button>`).join('');
+  showView('Editor');
+  setTimeout(() => document.getElementById('titleInput').focus(), 200);
+}
+
+window.selectMood = function(key, btn) {
+  selectedMood = key;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+};
+
+document.getElementById('btnNew').onclick = () => { currentId = null; openEditor(null); };
+document.getElementById('editorBack').onclick = () => { showView('List'); };
+
+document.getElementById('btnSave').onclick = async () => {
+  const title = document.getElementById('titleInput').value.trim();
+  const body = document.getElementById('bodyInput').value.trim();
+  if (!title && !body) { document.getElementById('titleInput').focus(); return; }
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  toast('저장 중...');
+  try {
+    if (currentId) {
+      await updateDoc(doc(colRef(), currentId), { title, body, mood: selectedMood, updatedAt: new Date().toISOString() });
+      const idx = entries.findIndex(e => e.id === currentId);
+      if (idx !== -1) { entries[idx].title = title; entries[idx].body = body; entries[idx].mood = selectedMood; }
+    } else {
+      const data = { title, body, mood: selectedMood, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      const ref = await addDoc(colRef(), data);
+      entries.unshift({ id: ref.id, ...data });
+    }
+    toast('저장됐어요 ✓');
+    renderList();
+    showView('List');
+    currentId = null;
+  } catch(e) {
+    toast('저장 실패. 다시 시도해주세요.');
+  }
+  btn.disabled = false;
+};
+
+document.getElementById('btnDelete').onclick = () => deleteEntry(currentId);
+
+async function deleteEntry(id) {
+  if (!confirm('이 일기를 삭제할까요?')) return;
+  try {
+    await deleteDoc(doc(colRef(), id));
+    entries = entries.filter(e => e.id !== id);
+    renderList();
+    showView('List');
+    currentId = null;
+    toast('삭제됐어요');
+  } catch(e) {
+    toast('삭제 실패. 다시 시도해주세요.');
+  }
+}
+
+window.doSearch = function() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const wrap = document.getElementById('searchList');
+  if (!q) { wrap.innerHTML = ''; return; }
+  const results = entries.filter(e => (e.title||'').toLowerCase().includes(q) || (e.body||'').toLowerCase().includes(q));
+  if (!results.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><p class="empty-text">"${escHtml(q)}"에 해당하는<br>일기가 없어요.</p></div>`;
+    return;
+  }
+  wrap.innerHTML = results.map(e => {
+    const mood = MOODS.find(m => m.key === e.mood);
+    return `<div class="entry-card" onclick="openDetail('${e.id}')">
+      <div class="card-meta">
+        ${mood ? `<span class="mood-dot" style="background:${mood.color}"></span>` : ''}
+        <span class="card-date">${formatDateShort(e.createdAt)}</span>
+      </div>
+      <div class="card-title">${escHtml(e.title || '제목 없음')}</div>
+      <div class="card-preview">${escHtml(e.body || '')}</div>
+    </div>`;
+  }).join('');
+};
+
+function renderStats() {
+  const wrap = document.getElementById('statsContent');
+  if (!entries.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p class="empty-text">일기를 써야 통계가 보여요!</p></div>`;
+    return;
+  }
+  const total = entries.length;
+  const dates = entries.map(e => e.createdAt.slice(0,10));
+  const uniqueDates = [...new Set(dates)].sort();
+  let streak = 0;
+  let checkDate = new Date();
+  while (true) {
+    const d = checkDate.toISOString().slice(0,10);
+    if (dates.includes(d)) { streak++; checkDate.setDate(checkDate.getDate()-1); }
+    else break;
+  }
+  const last7 = [];
+  for (let i=6;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    last7.push({ date: d.toISOString().slice(0,10), day: ['일','월','화','수','목','금','토'][d.getDay()] });
+  }
+  const moodCounts = {};
+  entries.forEach(e => { if (e.mood) moodCounts[e.mood] = (moodCounts[e.mood]||0)+1; });
+  const maxMood = Math.max(...Object.values(moodCounts), 1);
+  wrap.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">총 일기 수</div>
+      <div class="stat-value">${total}편</div>
+      <div class="stat-sub">첫 일기: ${formatDateShort(uniqueDates[0])}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">현재 연속 작성</div>
+      <div class="stat-value">${streak}일</div>
+      <div class="stat-sub">최근 7일</div>
+      <div class="streak-bar">
+        ${last7.map(item => `<div class="streak-dot ${dates.includes(item.date) ? 'has-entry' : ''}">${item.day}</div>`).join('')}
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">감정 분포</div>
+      <div class="mood-chart">
+        ${MOODS.map(m => {
+          const cnt = moodCounts[m.key] || 0;
+          const pct = Math.round(cnt / maxMood * 100);
+          return `<div class="mood-row-stat">
+            <span style="width:62px;font-size:13px">${m.emoji} ${m.label}</span>
+            <div class="mood-bar-bg"><div class="mood-bar-fill" style="width:${pct}%;background:${m.color}"></div></div>
+            <span class="mood-bar-count">${cnt}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+// 날짜 헤더
+const now = new Date();
+const weekdays = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+document.getElementById('headerDate').textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 ${weekdays[now.getDay()]}`;
+
+// textarea 자동 높이
+document.getElementById('bodyInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = this.scrollHeight + 'px';
+});
+
+// 로그인/로그아웃
+document.getElementById('btnGoogleLogin').onclick = async () => {
+  try {
+    await signInWithPopup(auth, new GoogleAuthProvider());
+  } catch(e) {
+    alert('로그인 실패: ' + e.message);
+  }
+};
+
+document.getElementById('btnLogout').onclick = async () => {
+  if (confirm('로그아웃 하시겠어요?')) await signOut(auth);
+};
+
+// 인증 상태 감지
+onAuthStateChanged(auth, async (user) => {
+  document.getElementById('screenLoading').style.display = 'none';
+  if (user) {
+    currentUser = user;
+    document.getElementById('screenLogin').style.display = 'none';
+    document.getElementById('screenApp').style.display = 'block';
+    await loadEntries();
+  } else {
+    currentUser = null;
+    entries = [];
+    document.getElementById('screenApp').style.display = 'none';
+    document.getElementById('screenLogin').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
