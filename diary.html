@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>나의 일기장</title>
+<title>Secret</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -456,7 +456,7 @@
 <!-- 로그인 -->
 <div id="screenLogin" class="login-screen" style="display:none">
   <div class="login-icon">📖</div>
-  <h1 class="login-title">나의 일기장</h1>
+  <h1 class="login-title">Secret</h1>
   <p class="login-sub">Google 계정으로 로그인하면<br>어떤 기기에서나 일기를 쓸 수 있어요.</p>
   <button class="btn-google" id="btnGoogleLogin">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -473,7 +473,7 @@
 <div id="screenApp" style="display:none">
   <div class="app-header">
     <div class="header-top">
-      <h1 class="app-title">✦ 일기장</h1>
+      <h1 class="app-title">Secret</h1>
       <div class="header-right">
         <button class="btn-logout" id="btnLogout" title="로그아웃">↩</button>
         <button class="btn-new" id="btnNew" aria-label="새 일기 쓰기">+</button>
@@ -559,11 +559,18 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const MOODS = [
-  { key: 'great',   emoji: '😊', label: '좋아요',    color: '#4caf92' },
-  { key: 'okay',    emoji: '😐', label: '그냥저냥',  color: '#b8a56a' },
-  { key: 'bad',     emoji: '😔', label: '힘들었어요', color: '#c8856a' },
-  { key: 'excited', emoji: '🤩', label: '신났어요',  color: '#e08c5a' },
-  { key: 'calm',    emoji: '😌', label: '평온해요',  color: '#7a9ecc' },
+  { key: 'great',    emoji: '😊', label: '좋아요',     color: '#4caf92' },
+  { key: 'excited',  emoji: '🤩', label: '신났어요',   color: '#e08c5a' },
+  { key: 'happy',    emoji: '😄', label: '행복해요',   color: '#f7c948' },
+  { key: 'love',     emoji: '🥰', label: '설레요',     color: '#e8758a' },
+  { key: 'calm',     emoji: '😌', label: '평온해요',   color: '#7a9ecc' },
+  { key: 'okay',     emoji: '😐', label: '그냥저냥',   color: '#b8a56a' },
+  { key: 'tired',    emoji: '😴', label: '피곤해요',   color: '#9e8fc4' },
+  { key: 'anxious',  emoji: '😰', label: '불안해요',   color: '#78b4c8' },
+  { key: 'bad',      emoji: '😔', label: '힘들었어요', color: '#c8856a' },
+  { key: 'angry',    emoji: '😤', label: '화났어요',   color: '#d95f5f' },
+  { key: 'sad',      emoji: '😢', label: '슬퍼요',     color: '#6a8fc8' },
+  { key: 'sick',     emoji: '🤒', label: '아파요',     color: '#a0b87a' },
 ];
 
 let currentUser = null;
