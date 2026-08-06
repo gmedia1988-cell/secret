@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>InBody 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #fdf8f3;
+    --surface: #fff;
+    --surface2: #faf5ef;
+    --text: #2c2420;
+    --text2: #8c7b72;
+    --text3: #b8a89e;
+    --accent: #c8856a;
+    --accent-light: #f5ede8;
+    --accent-dark: #a06650;
+    --border: rgba(180,140,120,0.18);
+    --border2: rgba(180,140,120,0.32);
+    --shadow: rgba(180,120,80,0.10);
+    --font-ui: 'Noto Sans KR', sans-serif;
+    --radius: 20px;
+    --radius-sm: 12px;
+
+    /* chart roles (dataviz palette) */
+    --chart-surface: #fcfcfb;
+    --grid: #e1e0d9;
+    --axis: #c3c2b7;
+    --muted: #898781;
+    --series-trend: #2a78d6;
+    --series-muscle: #1baf7a;
+    --series-fat: #eb6834;
+    --status-good: #0ca30c;
+    --status-critical: #d03b3b;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1814;
+      --surface: #2a211b;
+      --surface2: #231c16;
+      --text: #f0e6dc;
+      --text2: #a89080;
+      --text3: #6e5a50;
+      --accent: #d4967e;
+      --accent-light: rgba(210,130,90,0.15);
+      --border: rgba(180,140,120,0.12);
+      --border2: rgba(180,140,120,0.22);
+      --shadow: rgba(0,0,0,0.3);
+
+      --chart-surface: #1a1a19;
+      --grid: #2c2c2a;
+      --axis: #383835;
+      --muted: #898781;
+      --series-trend: #3987e5;
+      --series-muscle: #199e70;
+      --series-fat: #d95926;
+      --status-good: #0ca30c;
+      --status-critical: #e66767;
+    }
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+    overscroll-behavior: none;
+  }
+
+  /* 로그인 / 로딩 */
+  .login-screen {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 40px 32px; text-align: center;
+  }
+  .login-icon { font-size: 56px; margin-bottom: 20px; }
+  .login-title { font-size: 26px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: 1px; }
+  .login-sub { font-size: 15px; color: var(--text2); line-height: 1.6; margin-bottom: 40px; }
+  .btn-google {
+    display: flex; align-items: center; gap: 12px; padding: 14px 28px;
+    border-radius: var(--radius-sm); background: var(--surface);
+    border: 1px solid var(--border2); color: var(--text); font-size: 16px;
+    cursor: pointer; transition: all 0.15s; font-family: var(--font-ui);
+  }
+  .btn-google:active { transform: scale(0.97); }
+  .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; flex-direction: column; gap: 16px; }
+  .spinner { width: 32px; height: 32px; border: 2.5px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--text3); }
+
+  /* 헤더 */
+  .app-header {
+    position: sticky; top: 0; z-index: 100; background: var(--bg);
+    border-bottom: 1px solid var(--border); padding: 16px 20px 12px;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .app-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+  .header-right { display: flex; gap: 8px; align-items: center; }
+  .btn-icon {
+    width: 34px; height: 34px; border-radius: 50%; background: none;
+    border: 1px solid var(--border2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text3); font-size: 16px; transition: all 0.15s;
+  }
+  .btn-icon:active { background: var(--surface2); }
+
+  /* 탭 */
+  .tabs { display: flex; gap: 6px; padding: 12px 20px 0; }
+  .tab {
+    font-size: 14px; color: var(--text3);
+    background: none; border: none; padding: 6px 0; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+    font-family: var(--font-ui);
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* 입력 폼 */
+  .form-wrap { padding: 20px 20px 100px; }
+  .field-group { margin-bottom: 18px; }
+  .field-label { font-size: 13px; color: var(--text2); margin-bottom: 6px; display: block; }
+  .field-row { display: flex; align-items: center; gap: 8px; }
+  input.field-input, input.date-input, textarea.memo-input {
+    width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border2); background: var(--surface); color: var(--text);
+    font-size: 16px; outline: none; transition: border-color 0.15s; font-family: var(--font-ui);
+  }
+  input.field-input:focus, input.date-input:focus, textarea.memo-input:focus { border-color: var(--accent); }
+  .field-unit { font-size: 13px; color: var(--text3); min-width: 42px; text-align: left; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  textarea.memo-input { resize: none; min-height: 70px; line-height: 1.6; }
+  .required-mark { color: var(--accent); }
+
+  .save-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: var(--bg); border-top: 1px solid var(--border); display: flex; gap: 10px;
+  }
+  .btn-save {
+    flex: 1; padding: 14px; border-radius: var(--radius-sm); background: var(--accent);
+    border: none; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, transform 0.12s; font-family: var(--font-ui);
+  }
+  .btn-save:active { transform: scale(0.97); background: var(--accent-dark); }
+  .btn-cancel {
+    padding: 14px 18px; border-radius: var(--radius-sm); background: none;
+    border: 1px solid var(--border2); color: var(--text3); font-size: 15px;
+    cursor: pointer; font-family: var(--font-ui);
+  }
+  .btn-delete {
+    padding: 14px 18px; border-radius: var(--radius-sm); background: none;
+    border: 1px solid var(--border2); color: var(--text3); font-size: 15px;
+    cursor: pointer; transition: all 0.12s; font-family: var(--font-ui);
+  }
+  .btn-delete:active { background: #fee; color: #c44; border-color: #c44; }
+
+  /* 기록 목록 */
+  .list-wrap { padding: 16px 20px 40px; display: flex; flex-direction: column; gap: 12px; }
+  .empty-state { text-align: center; padding: 60px 20px; }
+  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+  .empty-text { color: var(--text3); font-size: 16px; line-height: 1.6; }
+  .record-card {
+    background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 16px 18px; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s;
+  }
+  .record-card:active { transform: scale(0.985); box-shadow: 0 2px 12px var(--shadow); }
+  .record-date { font-size: 12px; color: var(--text3); margin-bottom: 8px; letter-spacing: 0.3px; }
+  .record-metrics { display: flex; flex-wrap: wrap; gap: 14px; }
+  .record-metric { display: flex; flex-direction: column; }
+  .record-metric .m-label { font-size: 11px; color: var(--text3); }
+  .record-metric .m-value { font-size: 16px; color: var(--text); font-weight: 500; }
+
+  /* 통계/대시보드 */
+  .stats-wrap { padding: 20px 20px 40px; }
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .summary-card { background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border); padding: 14px 16px; }
+  .summary-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+  .summary-value { font-size: 22px; color: var(--text); font-weight: 700; }
+  .summary-value .unit { font-size: 12px; font-weight: 400; color: var(--text3); margin-left: 2px; }
+  .summary-delta { font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 3px; }
+  .summary-delta.good { color: var(--status-good); }
+  .summary-delta.bad { color: var(--status-critical); }
+  .summary-delta.neutral { color: var(--text2); }
+  .summary-delta.flat { color: var(--text3); }
+
+  .section-title { font-size: 15px; font-weight: 700; color: var(--text); margin: 24px 0 12px; }
+  .chart-card {
+    background: var(--chart-surface); border-radius: var(--radius); border: 1px solid var(--border);
+    padding: 16px 16px 10px; margin-bottom: 14px; position: relative;
+  }
+  .chart-card-title { font-size: 13px; color: var(--text2); margin-bottom: 4px; font-weight: 500; }
+  .chart-empty { font-size: 13px; color: var(--text3); padding: 30px 0; text-align: center; }
+  .chart-svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+  .chart-point { fill: var(--series-trend); }
+  .chart-hit { fill: transparent; cursor: pointer; }
+  .chart-line { fill: none; stroke: var(--series-trend); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .chart-grid { stroke: var(--grid); stroke-width: 1; }
+  .chart-axis-label { fill: var(--muted); font-size: 10px; font-family: var(--font-ui); }
+  .chart-crosshair { stroke: var(--axis); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; pointer-events: none; }
+
+  .comp-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+  .comp-bar-label { width: 76px; color: var(--text2); flex-shrink: 0; }
+  .comp-bar-bg { flex: 1; height: 10px; background: var(--surface2); border-radius: 999px; overflow: hidden; }
+  .comp-bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
+  .comp-bar-value { min-width: 52px; text-align: right; color: var(--text3); font-size: 12px; }
+
+  .legend-row { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+
+  .table-toggle-wrap { text-align: center; margin: 20px 0 8px; }
+  .btn-table-toggle {
+    background: none; border: 1px solid var(--border2); color: var(--text2);
+    border-radius: 999px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: var(--font-ui);
+  }
+  .table-view { overflow-x: auto; margin-top: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  table.records-table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+  table.records-table th, table.records-table td {
+    padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  table.records-table th:first-child, table.records-table td:first-child { text-align: left; }
+  table.records-table th { color: var(--text3); font-weight: 500; background: var(--surface2); }
+  table.records-table td { color: var(--text); }
+
+  /* 툴팁 */
+  .chart-tooltip {
+    position: fixed; pointer-events: none; background: var(--text); color: var(--bg);
+    font-size: 12px; padding: 6px 10px; border-radius: 8px; opacity: 0; transition: opacity 0.1s;
+    z-index: 500; white-space: nowrap; transform: translate(-50%, -120%);
+  }
+  .chart-tooltip.show { opacity: 1; }
+
+  .saving-toast {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: var(--bg); font-size: 13px; padding: 8px 18px;
+    border-radius: 999px; opacity: 0; transition: opacity 0.2s;
+    pointer-events: none; z-index: 999; white-space: nowrap;
+  }
+  .saving-toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="screenLoading" class="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text">불러오는 중...</div>
+</div>
+
+<div id="screenLogin" class="login-screen" style="display:none">
+  <div class="login-icon">📊</div>
+  <h1 class="login-title">InBody 대시보드</h1>
+  <p class="login-sub">Google 계정으로 로그인하면<br>인바디 검사 결과를 기록하고 변화 추이를 볼 수 있어요.</p>
+  <button class="btn-google" id="btnGoogleLogin">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Google로 로그인
+  </button>
+</div>
+
+<div id="screenApp" style="display:none">
+  <div class="app-header">
+    <div class="header-top">
+      <h1 class="app-title">InBody 대시보드</h1>
+      <div class="header-right">
+        <button class="btn-icon" id="btnLogout" title="로그아웃">↩</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="input" onclick="switchTab('input',this)">입력</button>
+    <button class="tab" data-tab="records" onclick="switchTab('records',this)">기록</button>
+    <button class="tab" data-tab="stats" onclick="switchTab('stats',this)">통계</button>
+  </div>
+
+  <div id="viewInput" class="view active">
+    <div class="form-wrap">
+      <div class="field-group">
+        <label class="field-label">검사 날짜 <span class="required-mark">*</span></label>
+        <input class="date-input" id="fDate" type="date">
+      </div>
+      <div class="grid-2">
+        <div class="field-group">
+          <label class="field-label">체중 (kg) <span class="required-mark">*</span></label>
+          <input class="field-input" id="fWeight" type="number" step="0.1" inputmode="decimal" placeholder="예: 68.5">
+        </div>
+        <div class="field-group">
+          <label class="field-label">BMI</label>
+          <input class="field-input" id="fBmi" type="number" step="0.1" inputmode="decimal" placeholder="예: 22.4">
+        </div>
+        <div class="field-group">
+          <label class="field-label">골격근량 (kg)</label>
+          <input class="field-input" id="fMuscle" type="number" step="0.1" inputmode="decimal" placeholder="예: 31.2">
+        </div>
+        <div class="field-group">
+          <label class="field-label">체지방량 (kg)</label>
+          <input class="field-input" id="fFatMass" type="number" step="0.1" inputmode="decimal" placeholder="예: 14.8">
+        </div>
+        <div class="field-group">
+          <label class="field-label">체지방률 (%)</label>
+          <input class="field-input" id="fFatPct" type="number" step="0.1" inputmode="decimal" placeholder="예: 21.6">
+        </div>
+        <div class="field-group">
+          <label class="field-label">내장지방레벨</label>
+          <input class="field-input" id="fVisceral" type="number" step="1" inputmode="numeric" placeholder="예: 8">
+        </div>
+        <div class="field-group">
+          <label class="field-label">체수분 (L)</label>
+          <input class="field-input" id="fWater" type="number" step="0.1" inputmode="decimal" placeholder="예: 38.4">
+        </div>
+        <div class="field-group">
+          <label class="field-label">기초대사량 (kcal)</label>
+          <input class="field-input" id="fBmr" type="number" step="1" inputmode="numeric" placeholder="예: 1520">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">메모</label>
+        <textarea class="memo-input" id="fMemo" placeholder="컨디션, 식단, 운동 등 자유롭게 기록하세요"></textarea>
+      </div>
+    </div>
+    <div class="save-bar">
+      <button class="btn-cancel" id="btnCancelEdit" style="display:none">취소</button>
+      <button class="btn-delete" id="btnDeleteRecord" style="display:none">삭제</button>
+      <button class="btn-save" id="btnSaveRecord">저장하기</button>
+    </div>
+  </div>
+
+  <div id="viewRecords" class="view">
+    <div class="list-wrap" id="recordList"></div>
+  </div>
+
+  <div id="viewStats" class="view">
+    <div class="stats-wrap" id="statsContent"></div>
+  </div>
+</div>
+
+<div class="chart-tooltip" id="chartTooltip"></div>
+<div class="saving-toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCZ8GYafU6TKYw_uPQIKpE5s07rVDzrmHU",
+  authDomain: "secret-6cef1.firebaseapp.com",
+  projectId: "secret-6cef1",
+  storageBucket: "secret-6cef1.firebasestorage.app",
+  messagingSenderId: "27720129100",
+  appId: "1:27720129100:web:ca6f0ff2864ac04b5032e9",
+  measurementId: "G-JGPD8D9KVD"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// 각 지표: key, 표시명, 단위, 소수자리, 값이 높을수록 좋은지(null이면 중립)
+const METRICS = [
+  { key: 'weight',      label: '체중',       unit: 'kg',   decimals: 1, higherIsBetter: null },
+  { key: 'skeletalMuscleMass', label: '골격근량', unit: 'kg', decimals: 1, higherIsBetter: true },
+  { key: 'bodyFatMass',  label: '체지방량',   unit: 'kg',   decimals: 1, higherIsBetter: false },
+  { key: 'bodyFatPercentage', label: '체지방률', unit: '%', decimals: 1, higherIsBetter: false },
+  { key: 'bmi',          label: 'BMI',        unit: '',     decimals: 1, higherIsBetter: null },
+  { key: 'visceralFatLevel', label: '내장지방레벨', unit: '', decimals: 0, higherIsBetter: false },
+  { key: 'bodyWater',    label: '체수분',     unit: 'L',    decimals: 1, higherIsBetter: null },
+  { key: 'bmr',          label: '기초대사량', unit: 'kcal', decimals: 0, higherIsBetter: null },
+];
+
+let currentUser = null;
+let records = []; // sorted ascending by date
+let currentEditId = null;
+
+function colRef() { return collection(db, 'inbody', currentUser.uid, 'records'); }
+
+function toast(msg, duration = 1800) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view' + name).classList.add('active');
+}
+
+window.switchTab = function(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  showView(name === 'input' ? 'Input' : name === 'records' ? 'Records' : 'Stats');
+  if (name === 'records') renderRecordList();
+  if (name === 'stats') renderStats();
+};
+
+function num(v) {
+  if (v === '' || v === null || v === undefined) return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function fmt(v, decimals) {
+  if (v === null || v === undefined) return '-';
+  return v.toFixed(decimals);
+}
+
+async function loadRecords() {
+  const q = query(colRef(), orderBy('date', 'asc'));
+  const snap = await getDocs(q);
+  records = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderRecordList();
+}
+
+/* ---------- 입력 폼 ---------- */
+
+function resetForm() {
+  currentEditId = null;
+  document.getElementById('fDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('fWeight').value = '';
+  document.getElementById('fBmi').value = '';
+  document.getElementById('fMuscle').value = '';
+  document.getElementById('fFatMass').value = '';
+  document.getElementById('fFatPct').value = '';
+  document.getElementById('fVisceral').value = '';
+  document.getElementById('fWater').value = '';
+  document.getElementById('fBmr').value = '';
+  document.getElementById('fMemo').value = '';
+  document.getElementById('btnCancelEdit').style.display = 'none';
+  document.getElementById('btnDeleteRecord').style.display = 'none';
+  document.getElementById('btnSaveRecord').textContent = '저장하기';
+}
+
+function loadFormFromRecord(r) {
+  currentEditId = r.id;
+  document.getElementById('fDate').value = r.date || '';
+  document.getElementById('fWeight').value = r.weight ?? '';
+  document.getElementById('fBmi').value = r.bmi ?? '';
+  document.getElementById('fMuscle').value = r.skeletalMuscleMass ?? '';
+  document.getElementById('fFatMass').value = r.bodyFatMass ?? '';
+  document.getElementById('fFatPct').value = r.bodyFatPercentage ?? '';
+  document.getElementById('fVisceral').value = r.visceralFatLevel ?? '';
+  document.getElementById('fWater').value = r.bodyWater ?? '';
+  document.getElementById('fBmr').value = r.bmr ?? '';
+  document.getElementById('fMemo').value = r.memo || '';
+  document.getElementById('btnCancelEdit').style.display = '';
+  document.getElementById('btnDeleteRecord').style.display = '';
+  document.getElementById('btnSaveRecord').textContent = '수정 저장';
+}
+
+window.editRecord = function(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  loadFormFromRecord(r);
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'input'));
+  showView('Input');
+};
+
+document.getElementById('btnCancelEdit').onclick = () => resetForm();
+
+document.getElementById('btnSaveRecord').onclick = async () => {
+  const date = document.getElementById('fDate').value;
+  const weight = num(document.getElementById('fWeight').value);
+  if (!date) { toast('검사 날짜를 입력해주세요'); return; }
+  if (weight === null) { toast('체중을 입력해주세요'); return; }
+
+  const data = {
+    date,
+    weight,
+    bmi: num(document.getElementById('fBmi').value),
+    skeletalMuscleMass: num(document.getElementById('fMuscle').value),
+    bodyFatMass: num(document.getElementById('fFatMass').value),
+    bodyFatPercentage: num(document.getElementById('fFatPct').value),
+    visceralFatLevel: num(document.getElementById('fVisceral').value),
+    bodyWater: num(document.getElementById('fWater').value),
+    bmr: num(document.getElementById('fBmr').value),
+    memo: document.getElementById('fMemo').value.trim(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  const btn = document.getElementById('btnSaveRecord');
+  btn.disabled = true;
+  toast('저장 중...');
+  try {
+    if (currentEditId) {
+      await updateDoc(doc(colRef(), currentEditId), data);
+      const idx = records.findIndex(r => r.id === currentEditId);
+      if (idx !== -1) records[idx] = { id: currentEditId, ...records[idx], ...data };
+    } else {
+      data.createdAt = new Date().toISOString();
+      const ref = await addDoc(colRef(), data);
+      records.push({ id: ref.id, ...data });
+    }
+    records.sort((a, b) => a.date.localeCompare(b.date));
+    toast('저장됐어요 ✓');
+    resetForm();
+    renderRecordList();
+  } catch (e) {
+    toast('저장 실패. 다시 시도해주세요.');
+  }
+  btn.disabled = false;
+};
+
+document.getElementById('btnDeleteRecord').onclick = async () => {
+  if (!currentEditId) return;
+  if (!confirm('이 기록을 삭제할까요?')) return;
+  try {
+    await deleteDoc(doc(colRef(), currentEditId));
+    records = records.filter(r => r.id !== currentEditId);
+    toast('삭제됐어요');
+    resetForm();
+    renderRecordList();
+  } catch (e) {
+    toast('삭제 실패. 다시 시도해주세요.');
+  }
+};
+
+/* ---------- 기록 목록 ---------- */
+
+function formatDateShort(iso) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return `${y}.${m}.${d}`;
+}
+
+function renderRecordList() {
+  const wrap = document.getElementById('recordList');
+  if (!records.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p class="empty-text">아직 입력된 인바디 기록이 없어요.<br>첫 검사 결과를 입력해 보세요.</p></div>`;
+    return;
+  }
+  const sorted = [...records].sort((a, b) => b.date.localeCompare(a.date));
+  wrap.innerHTML = sorted.map(r => `
+    <div class="record-card" onclick="editRecord('${r.id}')">
+      <div class="record-date">${formatDateShort(r.date)}</div>
+      <div class="record-metrics">
+        <div class="record-metric"><span class="m-label">체중</span><span class="m-value">${fmt(r.weight, 1)}kg</span></div>
+        ${r.skeletalMuscleMass != null ? `<div class="record-metric"><span class="m-label">골격근량</span><span class="m-value">${fmt(r.skeletalMuscleMass,1)}kg</span></div>` : ''}
+        ${r.bodyFatPercentage != null ? `<div class="record-metric"><span class="m-label">체지방률</span><span class="m-value">${fmt(r.bodyFatPercentage,1)}%</span></div>` : ''}
+        ${r.bmi != null ? `<div class="record-metric"><span class="m-label">BMI</span><span class="m-value">${fmt(r.bmi,1)}</span></div>` : ''}
+      </div>
+    </div>`).join('');
+}
+
+/* ---------- 통계 / 대시보드 ---------- */
+
+function deltaHtml(curr, prev, higherIsBetter) {
+  if (curr == null || prev == null) return '';
+  const diff = curr - prev;
+  if (Math.abs(diff) < 0.05) return `<div class="summary-delta flat">변화 없음</div>`;
+  const up = diff > 0;
+  const arrow = up ? '▲' : '▼';
+  let cls = 'neutral';
+  if (higherIsBetter === true) cls = up ? 'good' : 'bad';
+  else if (higherIsBetter === false) cls = up ? 'bad' : 'good';
+  return `<div class="summary-delta ${cls}">${arrow} ${Math.abs(diff).toFixed(1)} (이전 대비)</div>`;
+}
+
+function renderSummaryCards() {
+  const last = records[records.length - 1];
+  const prev = records.length > 1 ? records[records.length - 2] : null;
+  const cards = [
+    { key: 'weight', label: '체중', unit: 'kg', decimals: 1, higherIsBetter: null },
+    { key: 'skeletalMuscleMass', label: '골격근량', unit: 'kg', decimals: 1, higherIsBetter: true },
+    { key: 'bodyFatPercentage', label: '체지방률', unit: '%', decimals: 1, higherIsBetter: false },
+    { key: 'bmi', label: 'BMI', unit: '', decimals: 1, higherIsBetter: null },
+  ];
+  return `<div class="summary-grid">${cards.map(c => {
+    const v = last[c.key];
+    const p = prev ? prev[c.key] : null;
+    return `<div class="summary-card">
+      <div class="summary-label">${c.label}</div>
+      <div class="summary-value">${v != null ? fmt(v, c.decimals) : '-'}<span class="unit">${c.unit}</span></div>
+      ${deltaHtml(v, p, c.higherIsBetter)}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderCompositionBars() {
+  const last = records[records.length - 1];
+  const muscle = last.skeletalMuscleMass;
+  const fat = last.bodyFatMass;
+  if (muscle == null && fat == null) return '';
+  const max = Math.max(muscle || 0, fat || 0, last.weight || 1);
+  const rows = [
+    { label: '골격근량', value: muscle, color: 'var(--series-muscle)' },
+    { label: '체지방량', value: fat, color: 'var(--series-fat)' },
+  ].filter(r => r.value != null);
+  if (!rows.length) return '';
+  return `
+    <div class="section-title">체성분 구성 (최근 검사)</div>
+    <div class="chart-card">
+      ${rows.map(r => `
+        <div class="comp-bar-row">
+          <div class="comp-bar-label">${r.label}</div>
+          <div class="comp-bar-bg"><div class="comp-bar-fill" style="width:${Math.round(r.value / max * 100)}%;background:${r.color}"></div></div>
+          <div class="comp-bar-value">${fmt(r.value, 1)}kg</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+let tooltipEl;
+
+function buildTrendChart(key, label, unit, decimals) {
+  const pts = records.filter(r => r[key] != null).map(r => ({ date: r.date, value: r[key] }));
+  if (pts.length === 0) {
+    return `<div class="chart-card"><div class="chart-card-title">${label} 추이</div><div class="chart-empty">데이터 없음</div></div>`;
+  }
+  if (pts.length === 1) {
+    return `<div class="chart-card"><div class="chart-card-title">${label} 추이</div><div class="chart-empty">${fmt(pts[0].value, decimals)}${unit} (${formatDateShort(pts[0].date)}) · 추이를 보려면 2회 이상 기록하세요</div></div>`;
+  }
+
+  const W = 320, H = 130, padL = 8, padR = 8, padT = 16, padB = 22;
+  const values = pts.map(p => p.value);
+  let min = Math.min(...values), max = Math.max(...values);
+  if (min === max) { min -= 1; max += 1; }
+  const span = max - min;
+  min -= span * 0.1; max += span * 0.1;
+
+  const x = i => padL + (i / (pts.length - 1)) * (W - padL - padR);
+  const y = v => padT + (1 - (v - min) / (max - min)) * (H - padT - padB);
+
+  const linePath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i).toFixed(1)},${y(p.value).toFixed(1)}`).join(' ');
+
+  const gridLines = [min + (max - min) * 0.5, max].map(v => `
+    <line class="chart-grid" x1="${padL}" y1="${y(v).toFixed(1)}" x2="${W - padR}" y2="${y(v).toFixed(1)}"></line>
+    <text class="chart-axis-label" x="${padL}" y="${(y(v) - 4).toFixed(1)}">${v.toFixed(decimals)}</text>`).join('');
+
+  const firstLabel = `<text class="chart-axis-label" x="${x(0)}" y="${H - 6}" text-anchor="start">${formatDateShort(pts[0].date)}</text>`;
+  const lastLabel = `<text class="chart-axis-label" x="${x(pts.length - 1)}" y="${H - 6}" text-anchor="end">${formatDateShort(pts[pts.length - 1].date)}</text>`;
+
+  const points = pts.map((p, i) => `
+    <circle class="chart-point" cx="${x(i).toFixed(1)}" cy="${y(p.value).toFixed(1)}" r="4"></circle>
+    <circle class="chart-hit" data-date="${formatDateShort(p.date)}" data-value="${fmt(p.value, decimals)}${unit}" cx="${x(i).toFixed(1)}" cy="${y(p.value).toFixed(1)}" r="14"></circle>`).join('');
+
+  const chartId = 'chart_' + key;
+  return `<div class="chart-card">
+    <div class="chart-card-title">${label} 추이</div>
+    <svg class="chart-svg" id="${chartId}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+      ${gridLines}
+      <path class="chart-line" d="${linePath}"></path>
+      ${points}
+      ${firstLabel}
+      ${lastLabel}
+    </svg>
+  </div>`;
+}
+
+function attachChartTooltips() {
+  document.querySelectorAll('.chart-hit').forEach(el => {
+    const show = (evt) => {
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      tooltipEl.textContent = `${el.dataset.date} · ${el.dataset.value}`;
+      tooltipEl.style.left = clientX + 'px';
+      tooltipEl.style.top = clientY + 'px';
+      tooltipEl.classList.add('show');
+    };
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('mousemove', show);
+    el.addEventListener('mouseleave', () => tooltipEl.classList.remove('show'));
+    el.addEventListener('touchstart', (e) => { show(e); }, { passive: true });
+    el.addEventListener('touchend', () => tooltipEl.classList.remove('show'));
+  });
+}
+
+function renderTableView() {
+  const rows = [...records].sort((a, b) => b.date.localeCompare(a.date));
+  return `
+    <div class="table-toggle-wrap">
+      <button class="btn-table-toggle" id="btnToggleTable">표로 보기</button>
+    </div>
+    <div class="table-view" id="recordsTableView" style="display:none">
+      <table class="records-table">
+        <thead>
+          <tr>
+            <th>날짜</th><th>체중(kg)</th><th>골격근량(kg)</th><th>체지방량(kg)</th>
+            <th>체지방률(%)</th><th>BMI</th><th>내장지방</th><th>체수분(L)</th><th>기초대사량</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `<tr>
+            <td>${formatDateShort(r.date)}</td>
+            <td>${fmt(r.weight,1)}</td>
+            <td>${fmt(r.skeletalMuscleMass,1)}</td>
+            <td>${fmt(r.bodyFatMass,1)}</td>
+            <td>${fmt(r.bodyFatPercentage,1)}</td>
+            <td>${fmt(r.bmi,1)}</td>
+            <td>${fmt(r.visceralFatLevel,0)}</td>
+            <td>${fmt(r.bodyWater,1)}</td>
+            <td>${fmt(r.bmr,0)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderStats() {
+  const wrap = document.getElementById('statsContent');
+  if (!records.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><p class="empty-text">인바디 결과를 입력하면<br>변화 추이를 볼 수 있어요.</p></div>`;
+    return;
+  }
+
+  const trendCharts = [
+    { key: 'weight', label: '체중', unit: 'kg', decimals: 1 },
+    { key: 'skeletalMuscleMass', label: '골격근량', unit: 'kg', decimals: 1 },
+    { key: 'bodyFatPercentage', label: '체지방률', unit: '%', decimals: 1 },
+    { key: 'bmi', label: 'BMI', unit: '', decimals: 1 },
+    { key: 'visceralFatLevel', label: '내장지방레벨', unit: '', decimals: 0 },
+  ];
+
+  wrap.innerHTML = `
+    ${renderSummaryCards()}
+    ${renderCompositionBars()}
+    <div class="section-title">변화 추이</div>
+    ${trendCharts.map(c => buildTrendChart(c.key, c.label, c.unit, c.decimals)).join('')}
+    ${renderTableView()}
+  `;
+
+  attachChartTooltips();
+  const toggleBtn = document.getElementById('btnToggleTable');
+  if (toggleBtn) {
+    toggleBtn.onclick = () => {
+      const tv = document.getElementById('recordsTableView');
+      const open = tv.style.display !== 'none';
+      tv.style.display = open ? 'none' : '';
+      toggleBtn.textContent = open ? '표로 보기' : '표 닫기';
+    };
+  }
+}
+
+/* ---------- 인증 ---------- */
+
+document.getElementById('btnGoogleLogin').onclick = async () => {
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch (e) { alert('로그인 실패: ' + e.message); }
+};
+
+document.getElementById('btnLogout').onclick = async () => {
+  if (confirm('로그아웃 하시겠어요?')) await signOut(auth);
+};
+
+onAuthStateChanged(auth, async (user) => {
+  document.getElementById('screenLoading').style.display = 'none';
+  if (user) {
+    currentUser = user;
+    document.getElementById('screenLogin').style.display = 'none';
+    document.getElementById('screenApp').style.display = 'block';
+    tooltipEl = document.getElementById('chartTooltip');
+    resetForm();
+    await loadRecords();
+  } else {
+    currentUser = null;
+    records = [];
+    document.getElementById('screenApp').style.display = 'none';
+    document.getElementById('screenLogin').style.display = 'flex';
+  }
+});
+</script>
+</body>
+</html>
