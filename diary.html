@@ -223,44 +223,6 @@
   .mood-bar-fill { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.6s ease; }
   .mood-bar-count { font-size: 12px; color: var(--text3); min-width: 20px; text-align: right; }
 
-  /* 인바디 */
-  .inbody-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .inbody-metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; }
-  .inbody-metric-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
-  .inbody-metric-value { font-family: var(--font-body); font-size: 21px; color: var(--text); }
-  .inbody-metric-delta { font-size: 12px; margin-top: 4px; }
-  .inbody-metric-delta.good { color: #4caf92; }
-  .inbody-metric-delta.bad { color: #d95f5f; }
-  .inbody-metric-delta.flat { color: var(--text3); }
-  .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 12px; }
-  .chart-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-  .chart-title { font-size: 14px; color: var(--text2); }
-  .chart-latest { font-family: var(--font-body); font-size: 19px; color: var(--text); }
-  .chart-svg { width: 100%; height: auto; display: block; }
-  .chart-axis-label { font-size: 9px; fill: var(--text3); }
-  .inbody-history { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-  .inbody-history-item { display: flex; justify-content: space-between; align-items: center; background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; }
-  .inbody-history-date { font-size: 13px; color: var(--text); font-weight: 500; }
-  .inbody-history-values { font-size: 12px; color: var(--text3); margin-top: 2px; }
-  .inbody-history-del { background: none; border: none; color: var(--text3); font-size: 15px; cursor: pointer; padding: 4px 8px; flex-shrink: 0; }
-  .inbody-history-del:active { color: #c44; }
-  .btn-add-inbody {
-    width: 100%; padding: 14px; border-radius: var(--radius-sm); background: var(--accent);
-    border: none; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
-    margin-bottom: 16px; font-family: var(--font-ui); transition: background 0.15s, transform 0.12s;
-  }
-  .btn-add-inbody:active { transform: scale(0.98); background: var(--accent-dark); }
-  .inbody-field { margin-bottom: 14px; }
-  .inbody-field label { display: block; font-size: 13px; color: var(--text3); margin-bottom: 6px; }
-  .inbody-field input {
-    width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border2);
-    background: var(--surface); color: var(--text); font-size: 16px; outline: none; font-family: var(--font-ui);
-  }
-  .inbody-field input:focus { border-color: var(--accent); }
-  .inbody-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
-  .inbody-grid .inbody-field.full { grid-column: 1 / -1; }
-  .inbody-sheet-scroll { max-height: 70vh; overflow-y: auto; }
-
   /* 설정 패널 */
   .settings-panel {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -349,7 +311,6 @@
     <div class="tabs">
       <button class="tab active" onclick="switchTab('all',this)">모두</button>
       <button class="tab" onclick="switchTab('search',this)">검색</button>
-      <button class="tab" onclick="switchTab('inbody',this)">인바디</button>
       <button class="tab" onclick="switchTab('stats',this)">통계</button>
     </div>
     <div id="tabAll"><div class="list-wrap" id="entryList"></div></div>
@@ -358,9 +319,6 @@
         <input class="search-input" id="searchInput" type="search" placeholder="제목, 내용으로 검색..." oninput="doSearch()" />
       </div>
       <div class="list-wrap" id="searchList"></div>
-    </div>
-    <div id="tabInbody" style="display:none">
-      <div class="stats-wrap" id="inbodyContent"></div>
     </div>
     <div id="tabStats" style="display:none">
       <div class="stats-wrap" id="statsContent"></div>
@@ -427,32 +385,6 @@
   </div>
 </div>
 
-<!-- 인바디 입력 패널 -->
-<div class="settings-panel" id="inbodyPanel">
-  <div class="settings-sheet">
-    <div class="settings-title">인바디 기록 추가</div>
-    <div class="inbody-sheet-scroll">
-      <div class="inbody-field">
-        <label>측정 날짜</label>
-        <input type="date" id="inbodyDate">
-      </div>
-      <div class="inbody-grid">
-        <div class="inbody-field"><label>체중 (kg)</label><input type="number" step="0.1" inputmode="decimal" id="inbodyWeight" placeholder="예: 65.5"></div>
-        <div class="inbody-field"><label>골격근량 (kg)</label><input type="number" step="0.1" inputmode="decimal" id="inbodyMuscleMass" placeholder="예: 28.0"></div>
-        <div class="inbody-field"><label>체지방량 (kg)</label><input type="number" step="0.1" inputmode="decimal" id="inbodyBodyFatMass" placeholder="예: 15.0"></div>
-        <div class="inbody-field"><label>체지방률 (%)</label><input type="number" step="0.1" inputmode="decimal" id="inbodyBodyFatPercent" placeholder="예: 22.5"></div>
-        <div class="inbody-field"><label>BMI</label><input type="number" step="0.1" inputmode="decimal" id="inbodyBmi" placeholder="예: 22.0"></div>
-        <div class="inbody-field"><label>내장지방레벨</label><input type="number" step="1" inputmode="decimal" id="inbodyVisceralFat" placeholder="예: 7"></div>
-        <div class="inbody-field full"><label>기초대사량 (kcal)</label><input type="number" step="1" inputmode="decimal" id="inbodyBmr" placeholder="예: 1450"></div>
-      </div>
-    </div>
-    <div style="display:flex;gap:10px;margin-top:20px">
-      <button class="btn-delete" id="btnCloseInbody" style="flex:1">취소</button>
-      <button class="btn-save" id="btnSaveInbodyForm" style="flex:2">저장</button>
-    </div>
-  </div>
-</div>
-
 <div class="saving-toast" id="toast"></div>
 
 <script type="module">
@@ -495,19 +427,8 @@ const MOODS = [
   { key: 'nervous',    emoji: '😬', label: '긴장돼요',   color: '#c4a87a' },
 ];
 
-const INBODY_METRICS = [
-  { key: 'weight',          label: '체중',        unit: 'kg',   color: '#c8856a', goodDirection: null },
-  { key: 'muscleMass',      label: '골격근량',    unit: 'kg',   color: '#4caf92', goodDirection: 'up' },
-  { key: 'bodyFatMass',     label: '체지방량',    unit: 'kg',   color: '#d95f5f', goodDirection: 'down' },
-  { key: 'bodyFatPercent',  label: '체지방률',    unit: '%',    color: '#e08c5a', goodDirection: 'down' },
-  { key: 'bmi',             label: 'BMI',         unit: '',     color: '#7a9ecc', goodDirection: null },
-  { key: 'visceralFat',     label: '내장지방레벨', unit: '',    color: '#9e8fc4', goodDirection: 'down' },
-  { key: 'bmr',             label: '기초대사량',  unit: 'kcal', color: '#f7c948', goodDirection: 'up' },
-];
-
 let currentUser = null;
 let entries = [];
-let inbodyRecords = [];
 let currentId = null;
 let selectedMood = null;
 
@@ -555,7 +476,6 @@ document.getElementById('settingsPanel').onclick = (e) => {
 };
 
 function colRef() { return collection(db, 'diaries', currentUser.uid, 'entries'); }
-function inbodyColRef() { return collection(db, 'diaries', currentUser.uid, 'inbody'); }
 
 function toast(msg, duration = 1800) {
   const t = document.getElementById('toast');
@@ -571,12 +491,6 @@ async function loadEntries() {
   renderList();
 }
 
-async function loadInbody() {
-  const q = query(inbodyColRef(), orderBy('date', 'asc'));
-  const snap = await getDocs(q);
-  inbodyRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
 function formatDate(iso) {
   const d = new Date(iso);
   const days = ['일','월','화','수','목','금','토'];
@@ -585,9 +499,6 @@ function formatDate(iso) {
 function formatDateShort(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
-}
-function formatInbodyDate(dateStr) {
-  return (dateStr || '').replace(/-/g, '.');
 }
 function escHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -603,10 +514,8 @@ window.switchTab = function(name, btn) {
   btn.classList.add('active');
   document.getElementById('tabAll').style.display = name === 'all' ? '' : 'none';
   document.getElementById('tabSearch').style.display = name === 'search' ? '' : 'none';
-  document.getElementById('tabInbody').style.display = name === 'inbody' ? '' : 'none';
   document.getElementById('tabStats').style.display = name === 'stats' ? '' : 'none';
   if (name === 'stats') renderStats();
-  if (name === 'inbody') renderInbody();
 };
 
 function renderList() {
@@ -793,156 +702,6 @@ function renderStats() {
     </div>`;
 }
 
-function buildLineChart(sorted, metricKey, color) {
-  const points = sorted.filter(r => r[metricKey] != null).map(r => ({ date: r.date, val: r[metricKey] }));
-  if (!points.length) return `<div style="font-size:13px;color:var(--text3);padding:10px 0;text-align:center">데이터 없음</div>`;
-  if (points.length === 1) {
-    return `<div style="font-size:13px;color:var(--text3);padding:10px 0;text-align:center">기록이 1개 더 있으면 추세가 표시돼요</div>`;
-  }
-  const width = 300, height = 100, padding = 10, axisSpace = 16;
-  const values = points.map(p => p.val);
-  let min = Math.min(...values), max = Math.max(...values);
-  if (min === max) { min -= 1; max += 1; }
-  const stepX = (width - padding * 2) / (points.length - 1);
-  const coords = points.map((p, i) => ({
-    x: padding + i * stepX,
-    y: height - padding - ((p.val - min) / (max - min)) * (height - padding * 2),
-    val: p.val, date: p.date,
-  }));
-  const linePath = coords.map((c, i) => (i === 0 ? 'M' : 'L') + c.x.toFixed(1) + ',' + c.y.toFixed(1)).join(' ');
-  const areaPath = `${linePath} L${coords[coords.length - 1].x.toFixed(1)},${height - padding} L${coords[0].x.toFixed(1)},${height - padding} Z`;
-  const dots = coords.map(c => `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="3" style="fill:${color}"><title>${formatInbodyDate(c.date)}: ${c.val}</title></circle>`).join('');
-  return `
-    <svg class="chart-svg" viewBox="0 0 ${width} ${height + axisSpace}">
-      <path d="${areaPath}" style="fill:${color};opacity:0.14;stroke:none"/>
-      <path d="${linePath}" style="fill:none;stroke:${color};stroke-width:2"/>
-      ${dots}
-      <text class="chart-axis-label" x="${padding}" y="${height + 13}">${formatInbodyDate(coords[0].date)}</text>
-      <text class="chart-axis-label" x="${width - padding}" y="${height + 13}" text-anchor="end">${formatInbodyDate(coords[coords.length - 1].date)}</text>
-    </svg>`;
-}
-
-function renderInbodySummary(sorted) {
-  const latest = sorted[sorted.length - 1];
-  const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null;
-  const cards = INBODY_METRICS.filter(m => latest[m.key] != null).map(m => {
-    const val = latest[m.key];
-    let deltaHtml = '';
-    if (prev && prev[m.key] != null) {
-      const diff = Math.round((val - prev[m.key]) * 100) / 100;
-      const dir = diff > 0 ? 'up' : diff < 0 ? 'down' : 'flat';
-      let cls = 'flat';
-      if (diff !== 0 && m.goodDirection) cls = dir === m.goodDirection ? 'good' : 'bad';
-      const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '–';
-      deltaHtml = `<div class="inbody-metric-delta ${cls}">${arrow} ${Math.abs(diff)}${m.unit}</div>`;
-    }
-    return `<div class="inbody-metric-card">
-      <div class="inbody-metric-label">${m.label}</div>
-      <div class="inbody-metric-value">${val}${m.unit}</div>
-      ${deltaHtml}
-    </div>`;
-  }).join('');
-  return `<div class="inbody-summary-grid">${cards}</div>`;
-}
-
-function renderInbodyHistoryList(sorted) {
-  const desc = [...sorted].reverse();
-  return `<div class="inbody-history">
-    ${desc.map(r => `<div class="inbody-history-item">
-      <div>
-        <div class="inbody-history-date">${formatInbodyDate(r.date)}</div>
-        <div class="inbody-history-values">${INBODY_METRICS.filter(m => r[m.key] != null).map(m => `${m.label} ${r[m.key]}${m.unit}`).join(' · ') || '입력된 항목 없음'}</div>
-      </div>
-      <button class="inbody-history-del" onclick="deleteInbody('${r.id}')">✕</button>
-    </div>`).join('')}
-  </div>`;
-}
-
-function renderInbody() {
-  const wrap = document.getElementById('inbodyContent');
-  const addBtn = `<button class="btn-add-inbody" onclick="openInbodyForm()">+ 인바디 기록 추가</button>`;
-  if (!inbodyRecords.length) {
-    wrap.innerHTML = `${addBtn}<div class="empty-state"><div class="empty-icon">⚖️</div><p class="empty-text">아직 인바디 기록이 없어요.<br>측정 결과를 입력하고 변화를 추적해 보세요.</p></div>`;
-    return;
-  }
-  const sorted = [...inbodyRecords].sort((a, b) => a.date.localeCompare(b.date));
-  const charts = INBODY_METRICS.filter(m => sorted.some(r => r[m.key] != null)).map(m => {
-    const latestVal = [...sorted].reverse().find(r => r[m.key] != null);
-    return `<div class="chart-card">
-      <div class="chart-header">
-        <span class="chart-title">${m.label} 추이</span>
-        <span class="chart-latest">${latestVal ? latestVal[m.key] : '-'}${m.unit}</span>
-      </div>
-      ${buildLineChart(sorted, m.key, m.color)}
-    </div>`;
-  }).join('');
-  wrap.innerHTML = `
-    ${addBtn}
-    ${renderInbodySummary(sorted)}
-    ${charts}
-    <div class="stat-card">
-      <div class="stat-label">측정 기록 (${sorted.length}회)</div>
-      ${renderInbodyHistoryList(sorted)}
-    </div>`;
-}
-
-window.openInbodyForm = function() {
-  document.getElementById('inbodyDate').value = new Date().toISOString().slice(0, 10);
-  ['Weight','MuscleMass','BodyFatMass','BodyFatPercent','Bmi','VisceralFat','Bmr'].forEach(f => {
-    document.getElementById('inbody' + f).value = '';
-  });
-  document.getElementById('inbodyPanel').classList.add('open');
-};
-document.getElementById('btnCloseInbody').onclick = () => document.getElementById('inbodyPanel').classList.remove('open');
-document.getElementById('inbodyPanel').onclick = (e) => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('open'); };
-
-document.getElementById('btnSaveInbodyForm').onclick = async () => {
-  const date = document.getElementById('inbodyDate').value;
-  if (!date) { toast('측정 날짜를 입력해주세요'); return; }
-  const num = (id) => {
-    const v = document.getElementById(id).value;
-    return v === '' ? null : parseFloat(v);
-  };
-  const data = {
-    date,
-    weight: num('inbodyWeight'),
-    muscleMass: num('inbodyMuscleMass'),
-    bodyFatMass: num('inbodyBodyFatMass'),
-    bodyFatPercent: num('inbodyBodyFatPercent'),
-    bmi: num('inbodyBmi'),
-    visceralFat: num('inbodyVisceralFat'),
-    bmr: num('inbodyBmr'),
-    createdAt: new Date().toISOString(),
-  };
-  const hasValue = INBODY_METRICS.some(m => data[m.key] != null);
-  if (!hasValue) { toast('최소 한 개 이상의 항목을 입력해주세요'); return; }
-  const btn = document.getElementById('btnSaveInbodyForm');
-  btn.disabled = true;
-  toast('저장 중...');
-  try {
-    const ref = await addDoc(inbodyColRef(), data);
-    inbodyRecords.push({ id: ref.id, ...data });
-    toast('저장됐어요 ✓');
-    document.getElementById('inbodyPanel').classList.remove('open');
-    renderInbody();
-  } catch (e) {
-    toast('저장 실패. 다시 시도해주세요.');
-  }
-  btn.disabled = false;
-};
-
-window.deleteInbody = async function(id) {
-  if (!confirm('이 기록을 삭제할까요?')) return;
-  try {
-    await deleteDoc(doc(inbodyColRef(), id));
-    inbodyRecords = inbodyRecords.filter(r => r.id !== id);
-    renderInbody();
-    toast('삭제됐어요');
-  } catch (e) {
-    toast('삭제 실패. 다시 시도해주세요.');
-  }
-};
-
 const now = new Date();
 const weekdays = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
 document.getElementById('headerDate').textContent = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 ${weekdays[now.getDay()]}`;
@@ -967,11 +726,10 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     document.getElementById('screenLogin').style.display = 'none';
     document.getElementById('screenApp').style.display = 'block';
-    await Promise.all([loadEntries(), loadInbody()]);
+    await loadEntries();
   } else {
     currentUser = null;
     entries = [];
-    inbodyRecords = [];
     document.getElementById('screenApp').style.display = 'none';
     document.getElementById('screenLogin').style.display = 'flex';
   }
